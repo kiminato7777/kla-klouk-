@@ -1,0 +1,567 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body {
+    background-color: #8b5a2b;
+    /* High quality wood texture */
+    background-image: 
+        repeating-linear-gradient(to right, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 40px),
+        linear-gradient(to right, #5c3a21, #8b5a2b, #5c3a21);
+    background-size: 100% 100%, 100% 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Ambient glow when revealed */
+.ambient-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    z-index: 1;
+}
+
+.ambient-glow.active {
+    opacity: 1;
+    animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* Top Dice Area (Real 3D) */
+.top-dice-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 60px;
+    width: 100%;
+    z-index: 10;
+}
+
+.cube-scene {
+    width: 60px;
+    height: 60px;
+    perspective: 800px;
+}
+
+.cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    /* Initial Isometric View */
+    transform: rotateX(-30deg) rotateY(-45deg);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cube.revealed {
+    /* Show back face exactly flat to camera */
+    transform: rotateX(0deg) rotateY(180deg);
+}
+
+.cube .face {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: #fff;
+    border: 2px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+    backface-visibility: hidden;
+}
+
+/* Fix backface visibility for all sides to ensure solid cube */
+.cube .face { backface-visibility: visible; }
+
+.cube .front  { transform: translateZ(30px); background: #fef08a; } 
+.cube .back   { transform: rotateY(180deg) translateZ(30px); background: #fff; border: 2px solid #fbbf24;} 
+.cube .right  { transform: rotateY(90deg) translateZ(30px); background: #f9a8d4; }
+.cube .left   { transform: rotateY(-90deg) translateZ(30px); background: #93c5fd; }
+.cube .top    { transform: rotateX(90deg) translateZ(30px); background: #e2e8f0; }
+.cube .bottom { transform: rotateX(-90deg) translateZ(30px); background: #cbd5e1; }
+
+.question-mark {
+    color: #ef4444;
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+
+.result-emoji {
+    font-size: 2.8rem;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+}
+
+/* Plate Area */
+.plate-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 5;
+    perspective: 1000px;
+}
+
+.plate {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f0f9ff 20%, #bae6fd 80%);
+    border: 18px solid #f8fafc;
+    box-shadow: 
+        0 25px 50px rgba(0,0,0,0.8),
+        inset 0 0 40px rgba(0,0,0,0.3);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-style: preserve-3d;
+}
+
+.plate::before {
+    content: '';
+    position: absolute;
+    top: -12px; left: -12px; right: -12px; bottom: -12px;
+    border-radius: 50%;
+    border: 8px dashed #991b1b;
+    opacity: 0.9;
+}
+
+.plate-inner {
+    position: absolute;
+    width: 65%;
+    height: 65%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 60%);
+}
+
+/* Dice tumbling area */
+.plate-dice-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 150px;
+    z-index: 5;
+    transform-style: preserve-3d;
+}
+
+.die {
+    width: 55px;
+    height: 55px;
+    perspective: 500px;
+    position: relative;
+}
+
+.die-content {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.2rem;
+    box-shadow: 
+        inset -2px -2px 6px rgba(0,0,0,0.2),
+        2px 5px 15px rgba(0,0,0,0.5);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-style: preserve-3d;
+}
+
+/* Tumbling animation during shake */
+@keyframes tumble {
+    0% { transform: translate3d(0,0,0) rotateX(0) rotateY(0) rotateZ(0); }
+    20% { transform: translate3d(-10px,-10px,20px) rotateX(72deg) rotateY(144deg) rotateZ(30deg); }
+    40% { transform: translate3d(15px,-5px,10px) rotateX(144deg) rotateY(288deg) rotateZ(-20deg); }
+    60% { transform: translate3d(5px,15px,30px) rotateX(216deg) rotateY(432deg) rotateZ(45deg); }
+    80% { transform: translate3d(-15px,5px,15px) rotateX(288deg) rotateY(576deg) rotateZ(-15deg); }
+    100% { transform: translate3d(0,0,0) rotateX(360deg) rotateY(720deg) rotateZ(0); }
+}
+
+.die.tumbling .die-content {
+    animation: tumble 0.4s infinite linear;
+}
+
+/* The Cover (Dome) */
+.cover {
+    position: absolute;
+    top: -15px; left: -15px; right: -15px; bottom: -15px;
+    border-radius: 50%;
+    z-index: 10;
+    overflow: hidden;
+    background: 
+        radial-gradient(circle at 30% 30%, transparent 10%, rgba(0,0,0,0.85) 100%),
+        repeating-conic-gradient(from 0deg, 
+            #eab308 0deg 6deg, 
+            #ef4444 6deg 12deg, 
+            #eab308 12deg 18deg, 
+            #22c55e 18deg 24deg);
+    box-shadow: 
+        inset -10px -20px 40px rgba(0,0,0,0.8),
+        0 30px 40px rgba(0,0,0,0.7);
+    /* Dynamic Toss Animation */
+    transition: transform 0.8s cubic-bezier(0.5, -0.5, 0.1, 1.5), opacity 0.6s ease;
+    transform-origin: top right;
+}
+
+.cover-star {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px; height: 160px;
+    background: conic-gradient(from 0deg, transparent 0 36deg, #fde047 36deg 72deg, transparent 72deg 108deg, #fde047 108deg 144deg, transparent 144deg 180deg, #fde047 180deg 216deg, transparent 216deg 252deg, #fde047 252deg 288deg, transparent 288deg 324deg, #fde047 324deg 360deg);
+    opacity: 0.7;
+    border-radius: 50%;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.cover-texture {
+    position: absolute;
+    width: 100%; height: 100%;
+    background-image: 
+        repeating-radial-gradient(circle at center, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 5px, transparent 5px, transparent 10px),
+        repeating-conic-gradient(from 0deg, rgba(0,0,0,0.1) 0deg 2deg, transparent 2deg 4deg);
+}
+
+.cover-knob {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fde047, #b45309);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.4);
+}
+
+.cover.open {
+    /* Toss back and up */
+    transform: translateY(-450px) translateX(100px) rotateZ(60deg) rotateX(45deg) scale(0.8);
+    opacity: 0;
+}
+
+/* Violent Shaking Physics */
+@keyframes shakePlateDynamic {
+    0% { transform: translate(0,0) rotate(0deg); }
+    10% { transform: translate(-8px, -4px) rotate(-2deg); }
+    20% { transform: translate(10px, 2px) rotate(3deg); }
+    30% { transform: translate(-12px, 6px) rotate(-1deg); }
+    40% { transform: translate(8px, -8px) rotate(2deg); }
+    50% { transform: translate(-6px, 10px) rotate(-3deg); }
+    60% { transform: translate(12px, -2px) rotate(1deg); }
+    70% { transform: translate(-10px, -6px) rotate(-2deg); }
+    80% { transform: translate(6px, 8px) rotate(3deg); }
+    90% { transform: translate(-8px, 4px) rotate(-1deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+}
+
+.shaking {
+    animation: shakePlateDynamic 0.15s infinite;
+}
+
+/* Instruction Text */
+.instruction-text {
+    position: absolute;
+    bottom: 40px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 4px;
+    animation: pulseText 2s infinite;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+@keyframes pulseText {
+    0% { opacity: 0.3; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.3; transform: scale(0.95); }
+}
+
+/* Secret Cheat UI */
+.secret-trigger {
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 60px;
+    z-index: 100;
+}
+
+/* Stealth Indicator for the Host */
+.stealth-indicator {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: transparent;
+    z-index: 9999;
+    transition: background 0.3s ease;
+    pointer-events: none;
+}
+
+.stealth-indicator.active {
+    background: rgba(255, 255, 255, 0.15); /* Faint white dot, visible only if you know it's there */
+}
+
+/* Premium Glassmorphic Secret Cheat UI */
+.secret-panel {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 340px;
+    max-width: 90vw;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border: 3px solid #fbbf24;
+    border-radius: 20px;
+    padding: 22px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 
+        0 20px 50px rgba(0,0,0,0.8),
+        inset 0 0 15px rgba(251, 191, 36, 0.2);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.secret-panel.show {
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.secret-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.secret-header h3 {
+    color: #fbbf24;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    margin-bottom: 2px;
+}
+
+.secret-subtitle {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+/* Slots for loaded cheat */
+.cheat-slots-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 5px 0;
+}
+
+.cheat-slot {
+    width: 65px;
+    height: 65px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 2px dashed #64748b;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.cheat-slot:hover {
+    border-color: #fbbf24;
+    color: #fbbf24;
+}
+
+.cheat-slot.face-tiger,
+.cheat-slot.face-gourd,
+.cheat-slot.face-rooster,
+.cheat-slot.face-crab,
+.cheat-slot.face-fish,
+.cheat-slot.face-shrimp {
+    border: 2px solid #fbbf24;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+/* Selectable symbols grid */
+.cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 5px 0;
+}
+
+.cheat-grid-item {
+    aspect-ratio: 1;
+    background-color: #fff;
+    border: 2px solid #475569;
+    border-radius: 12px;
+    cursor: pointer;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.cheat-grid-item:hover {
+    transform: scale(1.08);
+    border-color: #fbbf24;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+}
+
+.cheat-grid-item:active {
+    transform: scale(0.95);
+}
+
+/* Options */
+.cheat-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.cheat-option-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.option-label {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.toggle-buttons {
+    display: flex;
+    background: #0f172a;
+    border-radius: 20px;
+    padding: 2px;
+    border: 1px solid #334155;
+}
+
+.toggle-btn {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+    color: #0f172a;
+    background: #fbbf24;
+    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.4);
+}
+
+/* Buttons */
+.cheat-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.primary-btn {
+    background: #fbbf24;
+    color: #0f172a;
+    box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
+}
+
+.primary-btn:hover {
+    background: #f59e0b;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5);
+}
+
+.danger-btn {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+.danger-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+}
+
+.action-btn:active {
+    transform: translateY(2px);
+}
+
+/* Traditional Dice Faces (Using actual images from IMG folder) */
+.face-tiger { background-image: url('IMG/A.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+.face-gourd { background-image: url('IMG/B.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+.face-rooster { background-image: url('IMG/C.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+.face-crab { background-image: url('IMG/D.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+.face-fish { background-image: url('IMG/E.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+.face-shrimp { background-image: url('IMG/F.png') !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; background-color: #fff !important; }
+
+/* Hide text if any residue */
+.die-img {
+    display: none;
+}

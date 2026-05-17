@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kla Klouk Pro​-PUDA​</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container" id="app-container">
+
+        <!-- Glowing effect when opened -->
+        <div class="ambient-glow" id="ambient-glow"></div>
+
+        <!-- Secret Trigger Area (Top Left) -->
+        <div id="secret-trigger" class="secret-trigger"></div>
+
+        <!-- Top Dice Area -->
+        <div class="top-dice-container">
+            <div class="cube-scene">
+                <div class="cube" id="top-die-1">
+                    <div class="face front"><span class="question-mark">?</span></div>
+                    <div class="face back">
+                        <div class="result-emoji"></div>
+                    </div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+                </div>
+            </div>
+            <div class="cube-scene">
+                <div class="cube" id="top-die-2">
+                    <div class="face front"><span class="question-mark">?</span></div>
+                    <div class="face back">
+                        <div class="result-emoji"></div>
+                    </div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+                </div>
+            </div>
+            <div class="cube-scene">
+                <div class="cube" id="top-die-3">
+                    <div class="face front"><span class="question-mark">?</span></div>
+                    <div class="face back">
+                        <div class="result-emoji"></div>
+                    </div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plate Area -->
+        <div class="plate-wrapper">
+            <div class="plate" id="plate-container">
+                <div class="plate-inner"></div>
+
+                <div class="plate-dice-grid" id="plate-dice-grid">
+                    <div class="die" id="die-1">
+                        <div class="die-content">❓</div>
+                    </div>
+                    <div class="die" id="die-2">
+                        <div class="die-content">❓</div>
+                    </div>
+                    <div class="die" id="die-3">
+                        <div class="die-content">❓</div>
+                    </div>
+                </div>
+
+                <div class="cover" id="bowl-cover">
+                    <!-- The star pattern on top -->
+                    <div class="cover-star"></div>
+                    <div class="cover-texture"></div>
+                    <div class="cover-knob"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instruction Text -->
+        <div class="instruction-text" id="instruction-text">
+            TAP TO SHAKE
+        </div>
+
+        <!-- Stealth Indicator for Host -->
+        <div id="stealth-indicator" class="stealth-indicator"></div>
+
+        <!-- Secret Panel UI -->
+        <div class="secret-panel" id="secret-panel">
+            <div class="secret-header">
+                <h3>ផ្ទាំងគ្រប់គ្រងលទ្ធផល 100%</h3>
+                <span class="secret-subtitle">Admin Control Panel</span>
+            </div>
+            
+            <!-- Slots for the next roll -->
+            <div class="cheat-slots-container">
+                <div class="cheat-slot" data-slot="0" id="slot-0">❓</div>
+                <div class="cheat-slot" data-slot="1" id="slot-1">❓</div>
+                <div class="cheat-slot" data-slot="2" id="slot-2">❓</div>
+            </div>
+            
+            <!-- Grid of selectable symbols -->
+            <div class="cheat-grid">
+                <div class="cheat-grid-item" data-symbol="tiger" style="background-image: url('IMG/A.png');"></div>
+                <div class="cheat-grid-item" data-symbol="gourd" style="background-image: url('IMG/B.png');"></div>
+                <div class="cheat-grid-item" data-symbol="rooster" style="background-image: url('IMG/C.png');"></div>
+                <div class="cheat-grid-item" data-symbol="crab" style="background-image: url('IMG/D.png');"></div>
+                <div class="cheat-grid-item" data-symbol="fish" style="background-image: url('IMG/E.png');"></div>
+                <div class="cheat-grid-item" data-symbol="shrimp" style="background-image: url('IMG/F.png');"></div>
+            </div>
+            
+            <!-- Mode Toggles -->
+            <div class="cheat-options">
+                <div class="cheat-option-group">
+                    <span class="option-label">របៀបលេង (Mode):</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" id="btn-mode-once">ម្ដងគត់</button>
+                        <button class="toggle-btn" id="btn-mode-always">រហូត</button>
+                    </div>
+                </div>
+                
+                <div class="cheat-option-group">
+                    <span class="option-label">សញ្ញាសម្គាល់ (Indicator):</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" id="btn-indicator-on">បើក</button>
+                        <button class="toggle-btn" id="btn-indicator-off">បិទ</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="cheat-actions">
+                <button id="btn-clear-cheat" class="action-btn danger-btn">លុបចោល</button>
+                <button id="btn-save-cheat" class="action-btn primary-btn">យល់ព្រម</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Added sounds for dynamic feeling -->
+    <audio id="shake-sound" preload="auto"></audio>
+    <audio id="reveal-sound" preload="auto"></audio>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
